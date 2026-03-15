@@ -1,6 +1,8 @@
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 import java.util.Map;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
@@ -164,6 +166,8 @@ public class SchedulerSimulation {
 
     private static int contextSwitches=0;
     public static void main(String[] args) {
+
+        List<Process> allProcesses = new ArrayList<>();
         // ⚠️ IMPORTANT: Put your student ID here to seed the random number generator
         // This makes your output unique to you - DO NOT forget to change this!
         int studentID = 445052180;  // ← CHANGE THIS TO YOUR ACTUAL STUDENT ID
@@ -301,7 +305,7 @@ public class SchedulerSimulation {
 
      System.out.println("\nprocess Summary");
      System.out.println("Name\tBurst Time\tWaiting Time");
-     for(Process p:process){
+     for(Process p:allProcesses){
         System.out.println(p.getName() +"\t"+p. getBurstTime() +"\t\t"+p.getWaitingTime());
      }
     }
@@ -319,8 +323,8 @@ public class SchedulerSimulation {
         processMap.put(thread, process);
         
         // Print a message indicating the process has entered the ready queue
-        System.out.println(Colors.BLUE + "  ➕ " + Colors.BOLD + Colors.CYAN + process.getName() + "(priority:"+process.getPriority()+")"
-                          Colors.RESET + Colors.BLUE + " added to ready queue" + Colors.RESET + 
+        System.out.println(Colors.BLUE + "  ➕ " + Colors.BOLD + Colors.CYAN + process.getName() + "(priority:"+process.getPriority()+")"+
+                           Colors.RESET+ Colors.BLUE + " added to ready queue" + Colors.RESET + 
                           " │ Burst time: " + Colors.YELLOW + process.getBurstTime() + "ms" + 
                           Colors.RESET);
                           
