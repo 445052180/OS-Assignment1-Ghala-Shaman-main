@@ -302,7 +302,7 @@ public class SchedulerSimulation {
                           "╚════════════════════════════════════════════════════════════════════════════════╝" + 
                           Colors.RESET + "\n");
 
-                          System.out.println("total context switches"+ contextSwitches);
+                          System.out.println("total context switches :  "+ contextSwitches);
 
      System.out.println("\nprocess Summary");
      System.out.println("Name\tBurst Time\tWaiting Time");
