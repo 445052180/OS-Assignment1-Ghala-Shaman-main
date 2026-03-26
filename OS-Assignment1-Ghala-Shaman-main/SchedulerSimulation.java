@@ -33,7 +33,8 @@ class Process implements Runnable {
     private int remainingTime; // Time left for the process to finish its execution
     private int priority  ;
     private long creationTime;
-    private long waitingTime;
+    private long totalWaitingTime;
+    private long lastReadyTime;
     // Constructor to initialize the process with name, burst time, and time quantum
     public Process(String name, int burstTime, int timeQuantum) {
         this.name = name;
@@ -42,15 +43,15 @@ class Process implements Runnable {
         this.remainingTime = burstTime; // Initially, remaining time is equal to the burst time
         this.priority=(int)(Math.random()*5) + 1;
         this.creationTime=System.currentTimeMillis();
-        this.waitingTime=0;
+        this.totalWaitingTime=0;
+        this.lastReadyTime=creationTime;
 
     }
    
     // This method will be called when the thread for this process is started
     @Override
     public void run() {
-        long startTime = System.currentTimeMillis();
-        waitingTime =startTime - creationTime;
+        
         // Simulate running for either the time quantum or remaining time, whichever is smaller
         int runTime = Math.min(timeQuantum, remainingTime); // Run for the smaller of the two times
         
@@ -137,7 +138,7 @@ class Process implements Runnable {
     // Getter methods for process name, burst time, and remaining time
 
     public long getWaitingTime() {
-        return waitingTime;
+        return totalWaitingTime;
     }
 
     public String getName() {
@@ -160,6 +161,16 @@ class Process implements Runnable {
      public int getPriority(){
         return priority;
     }
+
+    public void updateWaitingTime() {
+long currentTime = System.currentTimeMillis();
+totalWaitingTime += (currentTime - lastReadyTime);
+}
+
+public void setLastReadyTime(long time) {
+this.lastReadyTime = time;
+}
+
 }
 
 public class SchedulerSimulation {
@@ -262,6 +273,8 @@ public class SchedulerSimulation {
             System.out.println(Colors.BOLD + Colors.MAGENTA + "└" + "─".repeat(79) + Colors.RESET + "\n");
             
             // Start the thread, which will run the process for one time quantum
+         Process process = processMap.get(currentThread);
+         process.updateWaitingTime();
             currentThread.start();
             
             try {
@@ -272,20 +285,21 @@ public class SchedulerSimulation {
             }
             
             // Retrieve the process associated with the thread from the map
-            Process process = processMap.get(currentThread);
-            
+            Process process1 = processMap.get(currentThread);
+            process1.setLastReadyTime(System.currentTimeMillis());
             // Check if the process is not finished
-            if (!process.isFinished()) {
+            if (!process1.isFinished()) {
                 // If the process still has remaining time, check if there are more processes in queue
                 if (!processQueue.isEmpty()) {
                     // Re-enqueue the process to give it another chance to run in the next round
-                    addProcessToQueue(process, processQueue, processMap);
+                    process.setLastReadyTime(System.currentTimeMillis());
+                    addProcessToQueue(process1, processQueue, processMap);
                 } else {
                     // If this is the last process in the queue, run it to completion
-                    System.out.println(Colors.BRIGHT_YELLOW + "  ⚠ " + Colors.CYAN + process.getName() + 
+                    System.out.println(Colors.BRIGHT_YELLOW + "  ⚠ " + Colors.CYAN + process1.getName() + 
                                       Colors.RESET + Colors.YELLOW + " is the last process → running to completion" + 
                                       Colors.RESET);
-                    process.runToCompletion(); // Run until the process completes
+                    process1.runToCompletion(); // Run until the process completes
                 }
             }
         }
